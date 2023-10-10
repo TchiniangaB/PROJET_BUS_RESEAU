@@ -20,6 +20,7 @@ typedef enum BMP280_power_mode_enum
 
 typedef enum BMP280_register_enum
 {
+    BMP280_I2CADDR           = 0x77, // 7 bits
 	BMP280_CHIP_ID           = 0xD0,  // R Chip Id 0x58 (8 bits)
     BMP280_RESET             = 0xE0,  // R always 0x00 W 0xB6 to Force Reset (8 bits)
     BMP280_CONTROL           = 0xF4, // 7,6,5 osrs_t 4,3,2 osrs_p 1,0 mode(8 bits)
