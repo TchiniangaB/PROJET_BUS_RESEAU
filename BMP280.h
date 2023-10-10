@@ -55,7 +55,9 @@ typedef struct BMP280_I2C_drv_struct
 } BMP280_I2C_drv_t;
 
 typedef struct h_BMP280_struct
-{
+{   
+    // Chip ID
+    BMP280_CHIP_ID_t chip_id;
     // Sample
 	BMP280_sample_t sample;
 
@@ -76,4 +78,5 @@ typedef struct h_BMP280_struct
 
 } h_BMP280_t;
 
+int BMP280_init(h_BMP280_t * h_BMP280);
 #endif /* DRV_BMP280_H_ */

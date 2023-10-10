@@ -1,0 +1,101 @@
+0.015R
+NCS199A3RSQT2G 100nF 10UF
+
+orst_t[2:0]
+filter[2:0] 0xF5
+mode[1:0] bits in control register 0xF4
+datareadout 0xF7 to 0xFC
+ 1110111 (0x77)
+
+les adresses I²C possibles pour ce composant
+BMP280_I2CADDR           = 0x77 default
+
+le registre et la valeur permettant d'identifier ce composant
+0xD0 Id
+
+le registre et la valeur permettant de placer le composant en mode normal
+Adresse:
+# Power Modes
+BMP280_SLEEP_MODE         = 0 # mode[1:0] bits 00
+BMP280_FORCED_MODE        = 2 # mode[1:0] bits 10 and 01
+BMP280_NORMAL_MODE        = 3 # mode[1:0] bits 11
+
+les registres contenant l'étalonnage du composant
+0xF4 orst_t[2:0] orst_p[2:0]
+typedef enum adxl345_address_enum
+{
+	ADDR_DEVID       = 0x00,
+	ADDR_BW_RATE     = 0x2C,
+	ADDR_POWER_CTL   = 0x2D,
+	ADDR_INT_ENABLE  = 0x2E,
+	ADDR_DATA_FORMAT = 0x31,
+	ADDR_DATA_X0     = 0x32
+} adxl345_address_t;
+
+les registres contenant la pression (ainsi que le format)
+BMP280_PRESSURE_MSB      = 0xF7
+BMP280_PRESSURE_LSB      = 0xF8
+BMP280_PRESSURE_XLSB     = 0xF9
+
+les registres contenant la température (ainsi que le format)
+BMP280_TEMP_MSB          = 0xFA
+BMP280_TEMP_LSB          = 0xFB
+BMP280_TEMP_XLSB         = 0xFC
+
+
+les fonctions permettant le calcul de la température et de la pression compensées, en format entier 32 bits.
+// Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 DegC.
+// t_fine carries fine temperature as global value
+BMP280_S32_t t_fine;
+BMP280_S32_t bmp280_compensate_T_int32(BMP280_S32_t adc_T)
+{
+BMP280_S32_t var1, var2, T;
+var1 = ((((adc_T>>3) – ((BMP280_S32_t)dig_T1<<1))) * ((BMP280_S32_t)dig_T2)) >> 11;
+var2 = (((((adc_T>>4) – ((BMP280_S32_t)dig_T1)) * ((adc_T>>4) – ((BMP280_S32_t)dig_T1))) >> 12) *
+((BMP280_S32_t)dig_T3)) >> 14;
+t_fine = var1 + var2;
+T = (t_fine * 5 + 128) >> 8;
+return T;
+}
+“”–
+// Returns pressure in Pa as unsigned 32 bit integer in Q24.8 format (24 integer bits and 8 fractional bits).
+// Output value of “24674867” represents 24674867/256 = 96386.2 Pa = 963.862 hPa
+BMP280_U32_t bmp280_compensate_P_int64(BMP280_S32_t adc_P)
+{
+BMP280_S64_t var1, var2, p;
+var1 = ((BMP280_S64_t)t_fine) – 128000;
+var2 = var1 * var1 * (BMP280_S64_t)dig_P6;
+var2 = var2 + ((var1*(BMP280_S64_t)dig_P5)<<17);
+var2 = var2 + (((BMP280_S64_t)dig_P4)<<35);
+var1 = ((var1 * var1 * (BMP280_S64_t)dig_P3)>>8) + ((var1 * (BMP280_S64_t)dig_P2)<<12);
+var1 = (((((BMP280_S64_t)1)<<47)+var1))*((BMP280_S64_t)dig_P1)>>33;
+if (var1 == 0)
+{
+return 0; // avoid exception caused by division by zero
+}
+p = 1048576-adc_P;
+p = (((p<<31)-var2)*3125)/var1;
+var1 = (((BMP280_S64_t)dig_P9) * (p>>13) * (p>>13)) >> 25;
+var2 = (((BMP280_S64_t)dig_P8) * p) >> 19;
+p = ((p + var1 + var2) >> 8) + (((BMP280_S64_t)dig_P7)<<4);
+return (BMP280_U32_t)p;
+
+
+Fonction main :
+int I2C_transmit(uint8_t address, uint8_t *p_data, uint16_t size)
+{	
+	HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+	return 0;
+}
+
+int I2C_receive(uint8_t address, uint8_t *p_data, uint16_t size)
+{
+	
+	HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+	return 0;
+}
+
+h_BMP280.serial_drv.receive = I2C_receive;
+h_BMP280.serial_drv.transmit = I2C_transmit;
+BMP280_init(&h_BMP280);
+printf("chip ID = 0x%02X\r\n", h_BMP280.chip_id);
