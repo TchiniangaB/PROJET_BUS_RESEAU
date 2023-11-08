@@ -37,7 +37,7 @@ int		 	argc = 0;
 char*		token;
 int 		newCmdReady = 0;
 extern h_BMP280_t h_BMP280;
-extern UART_HandleTypeDef huart5;
+extern UART_HandleTypeDef huart2;
 
 /**
  * @brief Fonction d'initialisation du Shell
@@ -50,9 +50,9 @@ void Shell_Init(void){
 	memset(uartRxBuffer, NULL, UART_RX_BUFFER_SIZE*sizeof(char));
 	memset(uartTxBuffer, NULL, UART_TX_BUFFER_SIZE*sizeof(char));
 
-	HAL_UART_Receive_IT(&huart5, uartRxBuffer, UART_RX_BUFFER_SIZE);
-	HAL_UART_Transmit(&huart5, started, strlen((char *)started), HAL_MAX_DELAY);
-	HAL_UART_Transmit(&huart5, prompt, strlen((char *)prompt), HAL_MAX_DELAY);
+	HAL_UART_Receive_IT(&huart2, uartRxBuffer, UART_RX_BUFFER_SIZE);
+	HAL_UART_Transmit(&huart2, started, strlen((char *)started), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart2, prompt, strlen((char *)prompt), HAL_MAX_DELAY);
 }
 
 /**
@@ -62,7 +62,7 @@ void Shell_Loop(void){
 	if(uartRxReceived){ //Condition verifiée lors de la réception d'un nouveau caractère UART
 		switch(uartRxBuffer[0]){
 		case ASCII_CR: //Nouvelle ligne, instruction à traiter
-			HAL_UART_Transmit(&huart5, newline, sizeof(newline), HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, newline, sizeof(newline), HAL_MAX_DELAY);
 			cmdBuffer[idx_cmd] = '\0';
 			argc = 0;
 			token = strtok(cmdBuffer, " ");
@@ -75,37 +75,37 @@ void Shell_Loop(void){
 			break;
 		case ASCII_BACK: //Suppression du dernier caractère
 			cmdBuffer[idx_cmd--] = '\0';
-			HAL_UART_Transmit(&huart5, backspace, sizeof(backspace), HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, backspace, sizeof(backspace), HAL_MAX_DELAY);
 			break;
 
 		default: //Nouveau caractère
 			cmdBuffer[idx_cmd++] = uartRxBuffer[0];
-			HAL_UART_Transmit(&huart5, uartRxBuffer, UART_RX_BUFFER_SIZE, HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, uartRxBuffer, UART_RX_BUFFER_SIZE, HAL_MAX_DELAY);
 		}
 		uartRxReceived = 0;
 	}
 
 	if(newCmdReady){ //Condition vérifiant la validitée d'une commande
 		if(strcmp(argv[0],"WhereisBrian?")==0){
-			HAL_UART_Transmit(&huart5, brian, sizeof(brian), HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, brian, sizeof(brian), HAL_MAX_DELAY);
 		}
 		else if(strcmp(argv[0],"etalonnage")==0){//Fonction help renvoyant la notice des fonctions spécifiées
 			BMP280_etalonnage(&h_BMP280);
 			int uartTxStringLength = snprintf((char *)uartTxBuffer, UART_TX_BUFFER_SIZE, "Etalonnage en cours\r\n");
-			HAL_UART_Transmit(&huart5, uartTxBuffer, uartTxStringLength, HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, uartTxBuffer, uartTxStringLength, HAL_MAX_DELAY);
 			if(strcmp(argv[1],"get_temp_press")==0){
 				int uartTxStringLength = snprintf((char *)uartTxBuffer, UART_TX_BUFFER_SIZE, "Acquisition de la température\r\n");
-				HAL_UART_Transmit(&huart5, uartTxBuffer, uartTxStringLength, HAL_MAX_DELAY);
+				HAL_UART_Transmit(&huart2, uartTxBuffer, uartTxStringLength, HAL_MAX_DELAY);
 				BMP280_get_temp(&h_BMP280);
 				BMP280_get_pressure(&h_BMP280);
-				printf("power mode = %f\r\n", h_BMP280.temp);
-				printf("sample = %f\r\n", h_BMP280.press);
+				printf("température = %f\r\n", h_BMP280.temp);
+				printf("pression = %f\r\n", h_BMP280.press);
 			}
 		}
 		else{
-			HAL_UART_Transmit(&huart5, cmdNotFound, sizeof(cmdNotFound), HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart2, cmdNotFound, sizeof(cmdNotFound), HAL_MAX_DELAY);
 		}
-		HAL_UART_Transmit(&huart5, prompt, sizeof(prompt), HAL_MAX_DELAY);
+		HAL_UART_Transmit(&huart2, prompt, sizeof(prompt), HAL_MAX_DELAY);
 		newCmdReady = 0;
 	}
 }
@@ -113,7 +113,7 @@ void Shell_Loop(void){
 /**
  * @brief Fonction Callback appelée lors de la réception d'un nouveau caractère
  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart5){
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart){
 	uartRxReceived = 1;
-	HAL_UART_Receive_IT(&huart5, uartRxBuffer, UART_RX_BUFFER_SIZE);
+	HAL_UART_Receive_IT(&huart2, uartRxBuffer, UART_RX_BUFFER_SIZE);
 }
