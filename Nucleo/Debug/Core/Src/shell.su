@@ -1,0 +1,3 @@
+../Core/Src/shell.c:44:6:Shell_Init	8	static
+../Core/Src/shell.c:59:6:Shell_Loop	24	static
+../Core/Src/shell.c:137:6:HAL_UART_RxCpltCallback	16	static

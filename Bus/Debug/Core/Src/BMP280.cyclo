@@ -1,4 +1,0 @@
-../Core/Src/BMP280.c:26:5:BMP280_init	3
-../Core/Src/BMP280.c:63:6:BMP280_etalonnage	2
-../Core/Src/BMP280.c:87:5:BMP280_get_temp	2
-../Core/Src/BMP280.c:107:5:BMP280_get_pressure	3

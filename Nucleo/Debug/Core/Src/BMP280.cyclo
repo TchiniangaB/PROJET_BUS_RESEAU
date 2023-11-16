@@ -1,0 +1,6 @@
+../Core/Src/BMP280.c:26:5:BMP280_init	3
+../Core/Src/BMP280.c:63:6:BMP280_etalonnage	2
+../Core/Src/BMP280.c:87:5:BMP280_get_temp	2
+../Core/Src/BMP280.c:106:5:BMP280_get_pressure	2
+../Core/Src/BMP280.c:126:14:bmp280_compensate_T_int32	1
+../Core/Src/BMP280.c:138:14:bmp280_compensate_P_int32	3
