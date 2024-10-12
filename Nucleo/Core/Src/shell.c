@@ -2,7 +2,7 @@
  *@file shell.c
  *@brief Shell permettant de controller le BMP280 et le CAN
  *@date Oct 1, 2023
- *@author Baptiste
+ *@author Tchinianga Bastien
  */
 
 
