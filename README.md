@@ -172,5 +172,5 @@ Ces tests permettent de valider le fonctionnement de l'I²C, du CAN, ainsi que d
 
 
 ## Auteurs
-[TCHINIANGA Bastien](mailto:bastien.tchinianga-mountou@ensea.fr?subject=[GitHub]%20TP%20Bus%20Reaseaux)
+[TCHINIANGA Bastien](mailto:bastien.tchinianga-mountou@ensea.fr?subject=[GitHub]%20TP%20Bus%20Reseau)
 
