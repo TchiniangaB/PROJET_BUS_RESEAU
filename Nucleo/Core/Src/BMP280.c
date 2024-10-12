@@ -2,7 +2,7 @@
  * BMP280.c
  *
  *  Created on: 10 oct. 2023
- *      Author: GILLES Baptiste
+ *      Author: Tchinianga Bastien
  */
 
 #include "BMP280.h"
